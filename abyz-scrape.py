@@ -23,7 +23,7 @@ def getcountries():
     countrydict = dict(zip(countries[7:], countrylinks[7:])) # first 6 links are header links, not country pages
     return countrydict 
 
-def mediasources(country, url):
+def mediasources(country, url, subcountry=None):
     sand = BeautifulSoup(fetch_webpage_text(url), BS_PARSER)
     tables = sand.find_all('table')
     
@@ -45,14 +45,22 @@ def mediasources(country, url):
     for d in datatables[1:]:
         cells = d.findChildren('td', attrs = {'nowrap':''})
         
+        # get region, mediatype, mediafocus, and language columns
         region += cells[0].get_text()[2:-2].split('\n')        
-        name += [a.get_text().replace('\n','') for a in cells[1].find_all('a')]
-        link += [a.get('href') for a in cells[1].find_all('a')]
         mediatype += cells[2].get_text()[2:-2].split('\n')
         mediafocus += cells[3].get_text()[2:-2].split('\n')
         language += cells[4].get_text()[2:-2].split('\n')
         
-        remove = [i for i,r in enumerate(region) if r==''] # need to remove all rows for which "region" is empty
+        # get all the site names and links, row by row, inserting empty strings if there is no <a> tag in that row
+        name += [BeautifulSoup(i).find('a').get_text() if BeautifulSoup(i).find('a') else u'' for i in str(cells[1]).split('<br>')]
+        link += [BeautifulSoup(i).find('a').get('href') if BeautifulSoup(i).find('a') else u'' for i in str(cells[1]).split('<br>')]
+        
+        # remove all rows for which "language" is empty - language entry is never two rows long
+        remove = [i for i,r in enumerate(language) if r==''] 
+        remove.reverse()
+        
+        # number of added elements
+        added = len(cells[4].get_text()[2:-2].split('\n')) - len(remove)
         
         # dealing with Sierra Leone Broadcasting Corporation:
         # if len(region) < len(names), combine last two elements if you're not already removing it
@@ -62,18 +70,19 @@ def mediasources(country, url):
                 name[-1] += ' '+name2
                 del link[-1]
         
-        remove.reverse()
         for r in remove:
-            del region[r]
             del link[r]
             del mediatype[r]
             del mediafocus[r]
             del language[r]
             
-            name2 = name.pop(r) # append second row of name to the element before it
+            region2 = region.pop(r) # append popped region string to element before it
+            region[r-1] += ' '+region2
+            region[r-1] = region[r-1].strip() #strip trailing spaces
+            
+            name2 = name.pop(r) # append popped name string to element before it
             name[r-1] += ' '+name2
-        
-        added = len(cells[0].get_text()[2:-2].split('\n')) - len(remove) # number of elements added
+            name[r-1] = name[r-1].strip()
         
         # need to check if notes column is empty
         if len(cells[5].get_text().strip()) != 0: # if not empty
@@ -81,25 +90,27 @@ def mediasources(country, url):
             notestring = notestring[notestring.find('"2">')+4:] # remove prefix tags
             notestring = notestring[:notestring.find('</')] # remove trailing tags
             newnotes = [unicode(r) for r in notestring.split('<br>')] # split by <br> tags
-        else:
-            newnotes = [unicode('')]*added
-        
-        for r in remove:
-            notes2 = newnotes.pop(r)
-            newnotes[r-1] += notes2
-        
-        # this sometimes returns a list that's shorter than the others
-        # because the notes column doesn't necessarily have an entry for every row
-        # if so, add empty string entries to the end until it's the same length
-        newnotes += [unicode('')]*(added - len(newnotes))
-        notes += newnotes
+            # this sometimes returns a list that's shorter than the others
+            # because the notes column doesn't necessarily have an entry for every row
+            # if so, add empty string entries to the end until it's the same length
+            # also add extra buffer entries to account for the entries that will be removed in the next step
+            newnotes += [unicode('')]*(added - len(newnotes) + len(remove))
             
+            notes += newnotes
+            for r in remove:
+                notes2 = notes.pop(r) # append popped note strings to previous note entry
+                notes[r-1] += ' '+notes2
+                notes[r-1] = notes[r-1].strip() # strip trailing whitespace            
+        else: # if empty, buffer with appropriate number of empty strings
+            notes += [u'']*added
+                    
         # safety check that all lists are still same length
         l = len(region)
         if not (len(name) == l and len(link) == l and len(mediatype) == l and len(mediafocus) == l and len(language) == l and len(notes) == l):
-            print newnotes, 'length:', len(newnotes)
+            print region, ' length: ', l
             print name, 'length:', len(name)
             print notes, 'length:', len(notes)
+            print link, 'length:', len(link)
             raise ValueError("table columns are different lengths!")
     
     # put everything into a dataframe - not sure yet how to handle name repetitions
@@ -113,6 +124,7 @@ def mediasources(country, url):
     alldata = pd.DataFrame(alldatadict)
     alldata.index.name = 'name'
     alldata['country'] = country
+    alldata['subcountry'] = subcountry
     return alldata
 
 test_afghanistan = mediasources('Afghanistan', 'http://www.abyznewslinks.com/afgha.htm')
@@ -120,3 +132,4 @@ test_ireland = mediasources('Ireland', 'http://www.abyznewslinks.com/irela.htm')
 test_egypt = mediasources('Egypt', 'http://www.abyznewslinks.com/egypt.htm')
 test_sierraleone = mediasources('Sierra Leone', 'http://www.abyznewslinks.com/sierr.htm')
 test_sgssi = mediasources('South Georgia and South Sandwich Islands', 'http://www.abyznewslinks.com/sgeor.htm')
+test_massachusetts = mediasources('United States', 'http://www.abyznewslinks.com/unitema.htm', subcountry = 'Massachusetts')
