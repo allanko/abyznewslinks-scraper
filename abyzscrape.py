@@ -9,12 +9,6 @@ import cache
 BS_PARSER = "html.parser"
 ROOTURL = u'http://www.abyznewslinks.com/'
 
-#countrydict = getcountries() 
-#
-#for country in countrydict.keys():
-#    if len(countrydict[country]) == 1:
-#        get = mediasources(country, ROOTURL + countrydict[country][0])
-
 def fetch_webpage_text(url, use_cache=True):
     if use_cache and cache.contains(url):
         return cache.get(url)
@@ -172,3 +166,13 @@ def mediasources(country, url, subcountry=None):
     alldata['subcountry'] = subcountry
     
     return alldata
+
+# main
+
+#countrydict = getcountries() 
+#
+#for country in countrydict.keys():
+#    if len(countrydict[country]) == 1:
+#        get = mediasources(country, ROOTURL + countrydict[country][0])
+#    else:
+#        subregions = countrydict[country][1]

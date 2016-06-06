@@ -3,6 +3,34 @@ from abyzscrape import *
 
 class test_abyzscrape(unittest.TestCase):
     
+    def test_getcountries(self):
+        countrydict = getcountries()
+        
+        # afghanistan
+        self.assertEqual(countrydict['Afghanistan'], ['afgha.htm'])
+        
+        # vatican
+        self.assertEqual(countrydict['Holy See'], ['vatic.htm'])
+        
+        # zimbabwe
+        self.assertEqual(countrydict['Zimbabwe'], ['zimba.htm'])
+        
+        # india has a subregions page
+        self.assertEqual(countrydict['India'][0], 'india.htm')
+        self.assertEqual(countrydict['India'][1]['Haryana'], ['india_haryana.htm'])
+        self.assertEqual(countrydict['India'][1]['Mizoram'], ['india_mizoram.htm'])
+        self.assertEqual(countrydict['India'][1]['West Bengal'], ['india_west_bengal.htm'])
+        self.assertEqual(countrydict['India'][1]['India National'], ['india_national.htm'])
+
+        # united states has subregions listed by both state and city
+        # make sure we're grabbing states, not cities
+        self.assertEqual(countrydict['United States'][0], 'unite.htm')
+        self.assertEqual(countrydict['United States'][1]['National'], ['unitena.htm'])
+        self.assertEqual(countrydict['United States'][1]['Wyoming'], ['unitewy.htm'])
+        self.assertEqual(countrydict['United States'][1]['Kansas'], ['uniteks.htm'])
+        self.assertEqual(countrydict['United States'][1]['South Carolina'], ['unitesc.htm'])
+                
+    
     def testSpain(self):
         data = mediasources('Spain', 'http://www.abyznewslinks.com/spain.htm')
         
