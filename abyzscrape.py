@@ -54,7 +54,7 @@ def getcountries():
 
 def mediasources(country, url, subcountry=None):
     # get pandas dataframe of all media sources on a page
-
+    
     print country, subcountry
 
     sand = BeautifulSoup(fetch_webpage_text(url), BS_PARSER)
@@ -78,12 +78,27 @@ def mediasources(country, url, subcountry=None):
     for d in datatables[1:]:
         cells = d.findChildren('td', attrs = {'nowrap':''})
         
-        # get region, mediatype, mediafocus, and language columns      
-        mediatype += cells[2].get_text()[2:-2].split('\n')
-        mediafocus += cells[3].get_text()[2:-2].split('\n')
-        language += cells[4].get_text()[2:-2].split('\n')
+        # can't split reliably by '\n' -- see Gava-Gava in Spain, or the Minnesota table.
+        # see Gava-Gava, in Spain
+        # get mediatype, mediafocus, language, region columns
+        typestring = str(cells[2])
+        if typestring.find('<br>') == -1:
+            mediatype += [cells[2].get_text().strip()] # only one entry
+        else:
+            mediatype += [r.strip() for r in typestring[typestring[:typestring.find('<br>')].rfind('>') + 1:typestring.find('</br>')].split('<br>')]
         
-        # can't reliably split region name by \n -- need to split by <br> tags. see Gava-Gava, in Spain
+        focusstring = str(cells[3])
+        if focusstring.find('<br>') == -1:
+            mediafocus += [cells[3].get_text().strip()] # only one entry
+        else:
+            mediafocus += [r.strip() for r in focusstring[focusstring[:focusstring.find('<br>')].rfind('>') + 1:focusstring.find('</br>')].split('<br>')]
+                
+        languagestring = str(cells[4])
+        if languagestring.find('<br>') == -1:
+            language += [cells[4].get_text().strip()] # only one entry
+        else:
+            language += [r.strip() for r in languagestring[languagestring[:languagestring.find('<br>')].rfind('>') + 1:languagestring.find('</br>')].split('<br>')]
+        
         regionstring = str(cells[0])
         if regionstring.find('<br>') == -1:
             region += [cells[0].get_text().strip()] # only one entry
@@ -160,6 +175,8 @@ def mediasources(country, url, subcountry=None):
             print name, 'length:', len(name)
             print notes, 'length:', len(notes)
             print link, 'length:', len(link)
+            print mediatype, 'length:', len(mediatype)
+            print mediafocus, 'length:', len(mediafocus)
             raise ValueError("table columns are different lengths!")
     
     # clean newline characters
@@ -183,15 +200,15 @@ def mediasources(country, url, subcountry=None):
     print 'DONE'
     return alldata
 
-if __name__ == "__main__":
-    countrydict = getcountries() 
-    
-    allframes = []
-    for country, sub in countrydict.iteritems():
-        if len(sub) == 1:
-            allframes += [mediasources(country, ROOTURL + sub[0])]
-        else:
-            for region, url in sub[1].iteritems():
-                allframes += [mediasources(country, ROOTURL + url[0], subcountry=region)]
-    
-    allmedia = pd.concat(allframes)
+#if __name__ == "__main__":
+#    countrydict = getcountries() 
+#    
+#    allframes = []
+#    for country, sub in countrydict.iteritems():
+#        if len(sub) == 1:
+#            allframes += [mediasources(country, ROOTURL + sub[0])]
+#        else:
+#            for region, url in sub[1].iteritems():
+#                allframes += [mediasources(country, ROOTURL + url[0], subcountry=region)]
+#    
+#    allmedia = pd.concat(allframes)
