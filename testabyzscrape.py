@@ -30,7 +30,6 @@ class test_abyzscrape(unittest.TestCase):
         self.assertEqual(countrydict['United States'][1]['Kansas'], ['uniteks.htm'])
         self.assertEqual(countrydict['United States'][1]['South Carolina'], ['unitesc.htm'])
                 
-    
     def testSpain(self):
         data = mediasources('Spain', 'http://www.abyznewslinks.com/spain.htm')
         

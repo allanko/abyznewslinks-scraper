@@ -1,12 +1,14 @@
-import requests, time
+# -*- coding: utf-8 -*- 
+
+import requests, time, sys
 import pandas as pd
 from bs4 import BeautifulSoup
 import cache
 
 # may take a while to run the first time
 # caches every country page with a 1-second delay
-
-BS_PARSER = "html.parser"
+sys.setrecursionlimit(1500) # so many <br> tags. oceans of <br>. html.parser hates <br>.
+BS_PARSER = "html.parser" 
 ROOTURL = u'http://www.abyznewslinks.com/'
 
 def fetch_webpage_text(url, use_cache=True):
@@ -52,6 +54,9 @@ def getcountries():
 
 def mediasources(country, url, subcountry=None):
     # get pandas dataframe of all media sources on a page
+
+    print country, subcountry
+
     sand = BeautifulSoup(fetch_webpage_text(url), BS_PARSER)
     tables = sand.find_all('table')
     
@@ -86,23 +91,48 @@ def mediasources(country, url, subcountry=None):
             region += [r.strip() for r in regionstring[regionstring[:regionstring.find('<br>')].rfind('>') + 1:regionstring.find('</br>')].split('<br>')]    
         
         # get all the site names and links, row by row, inserting empty strings if there is no <a> tag in that row
-        name += [BeautifulSoup(i, BS_PARSER).find('a').get_text() if BeautifulSoup(i, BS_PARSER).find('a') else u'' for i in str(cells[1]).split('<br>')]
-        link += [BeautifulSoup(i, BS_PARSER).find('a').get('href') if BeautifulSoup(i, BS_PARSER).find('a') else u'' for i in str(cells[1]).split('<br>')]
+        newentries = str(cells[1]).split('br>') # sometimes there's a typo where </br> is used instead of <br> - looking at you, El Zonda in Argentina
+        if '</' in newentries:
+            newentries = newentries[:newentries.index('</')] # exclude all the closing tags at the end
+        elif '</font>\n</td>' in newentries:
+            newentries = newentries[:newentries.index('</font>\n</td>')]
         
+        name += [BeautifulSoup(i, BS_PARSER).find('a').get_text() if BeautifulSoup(i, BS_PARSER).find('a') else u'' for i in newentries]
+        link += [BeautifulSoup(i, BS_PARSER).find('a').get('href') if BeautifulSoup(i, BS_PARSER).find('a') else u'' for i in newentries]
+        
+        # need to check if notes column is empty
+        # if empty, will be fixed in the "normalize column lengths" block below
+        if len(cells[5].get_text().strip()) != 0: 
+            notestring = str(cells[5]).replace('\n','')
+            notestring = notestring[notestring.find('"2">')+4:] # remove prefix tags
+            notestring = notestring[:notestring.find('</')] # remove trailing tags
+            notes += [r for r in notestring.split('<br>')] # split by <br> tags
+            # this sometimes returns a list that's shorter than the others
+            # because the notes column doesn't necessarily have an entry for every row
+            # we'll fix this in the "normalize column lengths" block below
+        
+        # normalize column lengths
+        # consider Yahoo, in Canada/National
+        # or Clara Mente, in Argentina/Buenos Aires
+        # or Sierra Leone Broadcasting Corporation, in Sierra Leone
+        minlength = min(len(language), len(name), len(region), len(notes))
+        maxlength = max(len(language), len(name), len(region), len(notes))
+        if minlength != maxlength:
+            if maxlength - len(language) == 1:
+                language += ['']
+                mediatype += ['']
+                mediafocus += ['']
+            if maxlength - len(name) == 1:
+                name += ['']
+                link += ['']
+            if maxlength - len(region) == 1:
+                region += ['']
+            if maxlength - len(notes) > 0:
+                notes += ['']*(maxlength-len(notes))
+
         # remove all rows for which "language" is empty - language entry is never two rows long
         remove = [i for i,r in enumerate(language) if r==''] 
         remove.reverse()
-        
-        # number of added elements
-        added = len(cells[4].get_text()[2:-2].split('\n')) - len(remove)
-        
-        # dealing with Sierra Leone Broadcasting Corporation:
-        # if len(region) < len(names), combine last two elements if you're not already removing it
-        if len(cells[0].get_text()[2:-2].split('\n')) < len([a.get_text().replace('\n','') for a in cells[1].find_all('a')]):
-            if len([a.get_text().replace('\n','') for a in cells[1].find_all('a')])-1 not in remove:
-                name2 = name.pop(-1)
-                name[-1] += ' '+name2
-                del link[-1]
         
         for r in remove:
             del link[r]
@@ -117,31 +147,16 @@ def mediasources(country, url, subcountry=None):
             name2 = name.pop(r) # append popped name string to element before it
             name[r-1] += ' '+name2
             name[r-1] = name[r-1].strip()
-        
-        # need to check if notes column is empty
-        if len(cells[5].get_text().strip()) != 0: # if not empty
-            notestring = str(cells[5]).replace('\n','')
-            notestring = notestring[notestring.find('"2">')+4:] # remove prefix tags
-            notestring = notestring[:notestring.find('</')] # remove trailing tags
-            newnotes = [unicode(r) for r in notestring.split('<br>')] # split by <br> tags
-            # this sometimes returns a list that's shorter than the others
-            # because the notes column doesn't necessarily have an entry for every row
-            # if so, add empty string entries to the end until it's the same length
-            # also add extra buffer entries to account for the entries that will be removed in the next step
-            newnotes += [unicode('')]*(added - len(newnotes) + len(remove))
             
-            notes += newnotes
-            for r in remove:
-                notes2 = notes.pop(r) # append popped note strings to previous note entry
-                notes[r-1] += ' '+notes2
-                notes[r-1] = notes[r-1].strip() # strip trailing whitespace            
-        else: # if empty, buffer with appropriate number of empty strings
-            notes += [u'']*added
+            notes2 = notes.pop(r) # append popped note strings to previous note entry
+            notes[r-1] += ' '+notes2
+            notes[r-1] = notes[r-1].strip() # strip trailing whitespace   
                     
         # safety check that all lists are still same length
-        l = len(region)
-        if not (len(name) == l and len(link) == l and len(mediatype) == l and len(mediafocus) == l and len(language) == l and len(notes) == l):
-            print region, ' length: ', l
+        l = len(language)
+        if not (len(name) == l and len(link) == l and len(mediatype) == l and len(mediafocus) == l and len(region) == l and len(notes) == l):
+            print language, ' length: ', l
+            print region, ' length: ', len(language)
             print name, 'length:', len(name)
             print notes, 'length:', len(notes)
             print link, 'length:', len(link)
@@ -153,26 +168,30 @@ def mediasources(country, url, subcountry=None):
     notes = [n.replace('\n','') for n in notes]
     
     # put everything into dataframe
-    alldatadict = {'region': pd.Series(region, index = name),
-                   'link': pd.Series(link, index = name),
+    alldatadict = {'link': pd.Series(link, index = name),
                    'media_type': pd.Series(mediatype, index = name),
                    'media_focus': pd.Series(mediafocus, index = name),
                    'language': pd.Series(language, index = name),
-                   'notes': pd.Series(notes, index = name)}
+                   'notes': pd.Series(notes, index = name),
+                   'region': pd.Series(region, index = name)}
                    
     alldata = pd.DataFrame(alldatadict)
     alldata.index.name = 'name'
-    alldata['country'] = country
     alldata['subcountry'] = subcountry
+    alldata['country'] = country
     
+    print 'DONE'
     return alldata
 
-# main
-
-#countrydict = getcountries() 
-#
-#for country in countrydict.keys():
-#    if len(countrydict[country]) == 1:
-#        get = mediasources(country, ROOTURL + countrydict[country][0])
-#    else:
-#        subregions = countrydict[country][1]
+if __name__ == "__main__":
+    countrydict = getcountries() 
+    
+    allframes = []
+    for country, sub in countrydict.iteritems():
+        if len(sub) == 1:
+            allframes += [mediasources(country, ROOTURL + sub[0])]
+        else:
+            for region, url in sub[1].iteritems():
+                allframes += [mediasources(country, ROOTURL + url[0], subcountry=region)]
+    
+    allmedia = pd.concat(allframes)
