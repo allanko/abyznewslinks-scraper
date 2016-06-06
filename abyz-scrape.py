@@ -1,4 +1,4 @@
-import requests, sys, logging, json, csv, collections, time
+import requests, time
 import pandas as pd
 from bs4 import BeautifulSoup
 import cache
@@ -8,45 +8,45 @@ BS_PARSER = "html.parser"
 def fetch_webpage_text(url,use_cache=True):
     if use_cache and cache.contains(url):
         return cache.get(url)
-    # cache miss, download it and sleep one second to prevent too-frequent calls
+    # if cache miss, download it and sleep one second to prevent too-frequent calls
     content = requests.get(url).text
     cache.put(url,content)
     time.sleep(1)
     return content
  
-#def getcountries():
+def getcountries():
     # get dictionary of country links from 'http://www.abyznewslinks.com/allco.htm'
-rooturl = u'http://www.abyznewslinks.com/'
-world = BeautifulSoup(fetch_webpage_text(rooturl + 'allco.htm'), BS_PARSER)
-
-countrylinks = [[a.get('href')] for a in world.find_all('a')]
-countries = [a.string for a in world.find_all('a')]
-countrydict = dict(zip(countries[7:], countrylinks[7:])) # first 6 links are header links, not country pages
-
-# need to get all the subtrees, for countries that have subpages of regions
-# test:
-countrydict = {u'United States': [u'unite.htm']}
-for country in countrydict.keys():
-    suburl = rooturl + countrydict[country][0]
-    countrysand = BeautifulSoup(fetch_webpage_text(suburl), BS_PARSER)
-    tables = countrysand.find_all('table')
-    # if tables[3] has "Media Type" as the first words, then this is a page with actual media listings
-    # otherwise, it's a subdirectory of subregions of the country
-
-    if tables[3].get_text().strip()[:10] != u'Media Type': 
-        regions = []
-        regionlinks = []
-        # region listings are always in tables of three columns - get all three-column tables
-        for table in [t for t in tables if len(t.findChildren('td')) == 3]:
-            regions += [a.get_text() for a in table.find_all('a')] # get all the region names in the table
-            regionlinks += [[a.get('href')] for a in table.find_all('a')] # get all the corresponding links
+    # may take a while to run the first time, as it caches every country page
+    rooturl = u'http://www.abyznewslinks.com/'
+    world = BeautifulSoup(fetch_webpage_text(rooturl + 'allco.htm'), BS_PARSER)
+    
+    countrylinks = [[a.get('href')] for a in world.find_all('a')]
+    countries = [a.string.strip() for a in world.find_all('a')]
+    countrydict = dict(zip(countries[7:], countrylinks[7:])) # first 6 links are header links, not country pages
+    
+    # need to get all the subtrees, for countries that have regional subpages
+    for country in countrydict.keys():
+        print country
+        suburl = rooturl + countrydict[country][0]
+        countrysand = BeautifulSoup(fetch_webpage_text(suburl), BS_PARSER)
+        tables = countrysand.find_all('table')
         
-        regiondict = dict(zip(regions, regionlinks))                
-        countrydict[country] += [regiondict] # okay - this works
-        
-        # NEXT STEP - MAKE THIS CHECK EVERY SINGLE COUNTRY PAGE
-        # AMERICA HAS SUBPAGES SORTED BY CITY -- CAN WE SKIP THIS TABLE? I THINK SO????? THEN INSTEAD OF ITERATING OVER ALL THREE-COLUMN TABLES,
-        # WE SHOULD JUST GRAB THE FIRST TABLE ON THE PAGE
+        # if tables[3] has "Media Type" as the first words, then this is a page with actual media listings
+        # otherwise, it's a subdirectory of subregions of the country
+        if tables[3].get_text().strip()[:10] != u'Media Type': 
+            regions = []
+            regionlinks = []
+            # region listings are always in tables of three columns - get all three-column tables
+            for table in tables:
+                if len(table.findChildren('td'))==3:
+                    regions += [a.get_text().strip() for a in table.find_all('a')] # get all the region names in the table
+                    regionlinks += [[a.get('href')] for a in table.find_all('a')] # get all the corresponding links
+                    break # only get the first table - note the USA subpage lists every state twice
+                    
+            regiondict = dict(zip(regions, regionlinks))                
+            countrydict[country] += [regiondict] 
+    
+    return countrydict
 
 def mediasources(country, url, subcountry=None):
     # get pandas dataframe of all media sources on a page
@@ -151,11 +151,13 @@ def mediasources(country, url, subcountry=None):
     alldata.index.name = 'name'
     alldata['country'] = country
     alldata['subcountry'] = subcountry
+    
     return alldata
 
-#test_afghanistan = mediasources('Afghanistan', 'http://www.abyznewslinks.com/afgha.htm')
-#test_ireland = mediasources('Ireland', 'http://www.abyznewslinks.com/irela.htm')
-#test_egypt = mediasources('Egypt', 'http://www.abyznewslinks.com/egypt.htm')
-#test_sierraleone = mediasources('Sierra Leone', 'http://www.abyznewslinks.com/sierr.htm')
-#test_sgssi = mediasources('South Georgia and South Sandwich Islands', 'http://www.abyznewslinks.com/sgeor.htm')
-#test_massachusetts = mediasources('United States', 'http://www.abyznewslinks.com/unitema.htm', subcountry = 'Massachusetts')
+    # tests/examples:
+    #test_afghanistan = mediasources('Afghanistan', 'http://www.abyznewslinks.com/afgha.htm')
+    #test_ireland = mediasources('Ireland', 'http://www.abyznewslinks.com/irela.htm')
+    #test_egypt = mediasources('Egypt', 'http://www.abyznewslinks.com/egypt.htm')
+    #test_sierraleone = mediasources('Sierra Leone', 'http://www.abyznewslinks.com/sierr.htm')
+    #test_sgssi = mediasources('South Georgia and South Sandwich Islands', 'http://www.abyznewslinks.com/sgeor.htm')
+    #test_massachusetts = mediasources('United States', 'http://www.abyznewslinks.com/unitema.htm', subcountry = 'Massachusetts')
