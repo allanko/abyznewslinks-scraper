@@ -1,7 +1,7 @@
 import unittest
 from abyzscrape import *
 
-class TestStringMethods(unittest.TestCase):
+class test_abyzscrape(unittest.TestCase):
     
     def testSpain(self):
         data = mediasources('Spain', 'http://www.abyznewslinks.com/spain.htm')
