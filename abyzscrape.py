@@ -3,9 +3,19 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import cache
 
-BS_PARSER = "html.parser"
+# may take a while to run the first time
+# caches every country page with a 1-second delay
 
-def fetch_webpage_text(url,use_cache=True):
+BS_PARSER = "html.parser"
+ROOTURL = u'http://www.abyznewslinks.com/'
+
+#countrydict = getcountries() 
+#
+#for country in countrydict.keys():
+#    if len(countrydict[country]) == 1:
+#        get = mediasources(country, ROOTURL + countrydict[country][0])
+
+def fetch_webpage_text(url, use_cache=True):
     if use_cache and cache.contains(url):
         return cache.get(url)
     # if cache miss, download it and sleep one second to prevent too-frequent calls
@@ -16,9 +26,7 @@ def fetch_webpage_text(url,use_cache=True):
  
 def getcountries():
     # get dictionary of country links from 'http://www.abyznewslinks.com/allco.htm'
-    # may take a while to run the first time, as it caches every country page
-    rooturl = u'http://www.abyznewslinks.com/'
-    world = BeautifulSoup(fetch_webpage_text(rooturl + 'allco.htm'), BS_PARSER)
+    world = BeautifulSoup(fetch_webpage_text(ROOTURL + 'allco.htm'), BS_PARSER)
     
     countrylinks = [[a.get('href')] for a in world.find_all('a')]
     countries = [a.string.strip() for a in world.find_all('a')]
@@ -27,7 +35,7 @@ def getcountries():
     # need to get all the subtrees, for countries that have regional subpages
     for country in countrydict.keys():
         print country
-        suburl = rooturl + countrydict[country][0]
+        suburl = ROOTURL + countrydict[country][0]
         countrysand = BeautifulSoup(fetch_webpage_text(suburl), BS_PARSER)
         tables = countrysand.find_all('table')
         
@@ -71,15 +79,21 @@ def mediasources(country, url, subcountry=None):
     for d in datatables[1:]:
         cells = d.findChildren('td', attrs = {'nowrap':''})
         
-        # get region, mediatype, mediafocus, and language columns
-        region += cells[0].get_text()[2:-2].split('\n')        
+        # get region, mediatype, mediafocus, and language columns      
         mediatype += cells[2].get_text()[2:-2].split('\n')
         mediafocus += cells[3].get_text()[2:-2].split('\n')
         language += cells[4].get_text()[2:-2].split('\n')
         
+        # can't reliably split region name by \n -- need to split by <br> tags. see Gava-Gava, in Spain
+        regionstring = str(cells[0])
+        if regionstring.find('<br>') == -1:
+            region += [cells[0].get_text().strip()] # only one entry
+        else:
+            region += [r.strip() for r in regionstring[regionstring[:regionstring.find('<br>')].rfind('>') + 1:regionstring.find('</br>')].split('<br>')]    
+        
         # get all the site names and links, row by row, inserting empty strings if there is no <a> tag in that row
-        name += [BeautifulSoup(i).find('a').get_text() if BeautifulSoup(i).find('a') else u'' for i in str(cells[1]).split('<br>')]
-        link += [BeautifulSoup(i).find('a').get('href') if BeautifulSoup(i).find('a') else u'' for i in str(cells[1]).split('<br>')]
+        name += [BeautifulSoup(i, BS_PARSER).find('a').get_text() if BeautifulSoup(i, BS_PARSER).find('a') else u'' for i in str(cells[1]).split('<br>')]
+        link += [BeautifulSoup(i, BS_PARSER).find('a').get('href') if BeautifulSoup(i, BS_PARSER).find('a') else u'' for i in str(cells[1]).split('<br>')]
         
         # remove all rows for which "language" is empty - language entry is never two rows long
         remove = [i for i,r in enumerate(language) if r==''] 
@@ -139,7 +153,12 @@ def mediasources(country, url, subcountry=None):
             print link, 'length:', len(link)
             raise ValueError("table columns are different lengths!")
     
-    # put everything into a dataframe - not sure yet how to handle name repetitions
+    # clean newline characters
+    region = [r.replace('\n','') for r in region]
+    name = [n.replace('\n','') for n in name]
+    notes = [n.replace('\n','') for n in notes]
+    
+    # put everything into dataframe
     alldatadict = {'region': pd.Series(region, index = name),
                    'link': pd.Series(link, index = name),
                    'media_type': pd.Series(mediatype, index = name),
@@ -153,11 +172,3 @@ def mediasources(country, url, subcountry=None):
     alldata['subcountry'] = subcountry
     
     return alldata
-
-    # tests/examples:
-    #test_afghanistan = mediasources('Afghanistan', 'http://www.abyznewslinks.com/afgha.htm')
-    #test_ireland = mediasources('Ireland', 'http://www.abyznewslinks.com/irela.htm')
-    #test_egypt = mediasources('Egypt', 'http://www.abyznewslinks.com/egypt.htm')
-    #test_sierraleone = mediasources('Sierra Leone', 'http://www.abyznewslinks.com/sierr.htm')
-    #test_sgssi = mediasources('South Georgia and South Sandwich Islands', 'http://www.abyznewslinks.com/sgeor.htm')
-    #test_massachusetts = mediasources('United States', 'http://www.abyznewslinks.com/unitema.htm', subcountry = 'Massachusetts')
