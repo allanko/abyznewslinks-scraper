@@ -7,9 +7,10 @@ import cache
 
 # may take a while to run the first time
 # caches every country page with a 1-second delay
-sys.setrecursionlimit(2000) # so many <br> tags. oceans of <br>. html.parser hates <br>. worst cases: california, argentina
+sys.setrecursionlimit(2500) # so many <br> tags. oceans of <br>. html.parser hates <br>. worst cases: california, argentina
 BS_PARSER = "html.parser" 
 ROOTURL = u'http://www.abyznewslinks.com/'
+RUN = False # switch this to true to run script
 
 def fetch_webpage_text(url, use_cache=True):
     if use_cache and cache.contains(url):
@@ -67,13 +68,13 @@ def mediasources(country, url, subcountry=None):
             datatables += [table]
     
     # first table in datatables will be the site header - don't read that one
-    region = []
-    name = []
-    link = []
-    mediatype = []
-    mediafocus = []
-    language = []
-    notes = []
+    allregion = []
+    allname = []
+    alllink = []
+    allmediatype = []
+    allmediafocus = []
+    alllanguage = []
+    allnotes = []
     
     for d in datatables[1:]:
         cells = d.findChildren('td', attrs = {'nowrap':''})
@@ -81,29 +82,39 @@ def mediasources(country, url, subcountry=None):
         # can't split reliably by '\n' -- see Gava-Gava in Spain, or the Minnesota table.
         # so we split by <br> tag
         # get mediatype, mediafocus, language, region columns
+        # but also sometimes <br> is just missing - if so, attempt to split by \n as well (see Florida table, in "media type" column)
         typestring = str(cells[2])
         if typestring.find('<br>') == -1:
-            mediatype += [cells[2].get_text().strip()] # only one entry
+            mediatype = [cells[2].get_text().strip()] # only one entry
         else:
-            mediatype += [r.strip() for r in typestring[typestring[:typestring.find('<br>')].rfind('>') + 1:typestring.find('</br>')].split('<br>')]
+            mediatype = [r.strip() for r in typestring[typestring[:typestring.find('<br>')].rfind('>') + 1:typestring.find('</br>')].split('<br>')]
+        if max([len(t) for t in mediatype]) > 2: # unsuccessful splitting by <br>
+            mediatype = [t.split('\n') if len(t) > 2 else [t] for t in mediatype] # attempt to split by '\n'
+            mediatype = [t for cell in mediatype for t in cell] # collapse to one-layer list
         
         focusstring = str(cells[3])
         if focusstring.find('<br>') == -1:
-            mediafocus += [cells[3].get_text().strip()] # only one entry
+            mediafocus = [cells[3].get_text().strip()] # only one entry
         else:
-            mediafocus += [r.strip() for r in focusstring[focusstring[:focusstring.find('<br>')].rfind('>') + 1:focusstring.find('</br>')].split('<br>')]
+            mediafocus = [r.strip() for r in focusstring[focusstring[:focusstring.find('<br>')].rfind('>') + 1:focusstring.find('</br>')].split('<br>')]
+        if max([len(t) for t in mediafocus]) > 2: # unsuccessful splitting by <br>
+            mediafocus = [t.split('\n') if len(t) > 2 else [t] for t in mediafocus] # attempt to split by '\n'
+            mediafocus = [t for cell in mediafocus for t in cell] # collapse to one-layer list
                 
         languagestring = str(cells[4])
         if languagestring.find('<br>') == -1:
-            language += [cells[4].get_text().strip()] # only one entry
+            language = [cells[4].get_text().strip()] # only one entry
         else:
-            language += [r.strip() for r in languagestring[languagestring[:languagestring.find('<br>')].rfind('>') + 1:languagestring.find('</br>')].split('<br>')]
+            language = [r.strip() for r in languagestring[languagestring[:languagestring.find('<br>')].rfind('>') + 1:languagestring.find('</br>')].split('<br>')]
+        if max([len(t) for t in language]) > 3: # unsuccessful splitting by <br>
+            language = [t.split('\n') if len(t) > 3 else [t] for t in language] # attempt to split by '\n'
+            language = [t for cell in language for t in cell] # collapse to one-layer list
         
         regionstring = str(cells[0])
         if regionstring.find('<br>') == -1:
-            region += [cells[0].get_text().strip()] # only one entry
+            region = [cells[0].get_text().strip()] # only one entry
         else:
-            region += [r.strip() for r in regionstring[regionstring[:regionstring.find('<br>')].rfind('>') + 1:regionstring.find('</br>')].split('<br>')]    
+            region = [r.strip() for r in regionstring[regionstring[:regionstring.find('<br>')].rfind('>') + 1:regionstring.find('</br>')].split('<br>')]    
         
         # get all the site names and links, row by row, inserting empty strings if there is no <a> tag in that row
         newentries = str(cells[1]).split('br>') # sometimes there's a typo where </br> is used instead of <br> - looking at you, El Zonda in Argentina
@@ -112,8 +123,8 @@ def mediasources(country, url, subcountry=None):
         elif '</font>\n</td>' in newentries:
             newentries = newentries[:newentries.index('</font>\n</td>')]
         
-        name += [BeautifulSoup(i, BS_PARSER).find('a').get_text() if BeautifulSoup(i, BS_PARSER).find('a') else u'' for i in newentries]
-        link += [BeautifulSoup(i, BS_PARSER).find('a').get('href') if BeautifulSoup(i, BS_PARSER).find('a') else u'' for i in newentries]
+        name = [BeautifulSoup(i, BS_PARSER).find('a').get_text() if BeautifulSoup(i, BS_PARSER).find('a') else u'' for i in newentries]
+        link = [BeautifulSoup(i, BS_PARSER).find('a').get('href') if BeautifulSoup(i, BS_PARSER).find('a') else u'' for i in newentries]
         
         # need to check if notes column is empty
         # if empty, will be fixed in the "normalize column lengths" block below
@@ -121,11 +132,13 @@ def mediasources(country, url, subcountry=None):
             notestring = str(cells[5]).replace('\n','')
             notestring = notestring[notestring.find('"2">')+4:] # remove prefix tags
             notestring = notestring[:notestring.find('</')] # remove trailing tags
-            notes += [r for r in notestring.split('<br>')] # split by <br> tags
+            notes = [r for r in notestring.split('<br>')] # split by <br> tags
             # this sometimes returns a list that's shorter than the others
             # because the notes column doesn't necessarily have an entry for every row
             # we'll fix this in the "normalize column lengths" block below
-        
+        else:
+            notes = []
+            
         # make column lengths equal by adding empty strings
         # consider Yahoo, in Canada/National
         # or Clara Mente, in Argentina/Buenos Aires
@@ -178,19 +191,28 @@ def mediasources(country, url, subcountry=None):
             print mediatype, 'length:', len(mediatype)
             print mediafocus, 'length:', len(mediafocus)
             raise ValueError("table columns are different lengths!")
+        
+        # append to table
+        allregion += region
+        allname += name
+        alllink += link
+        allmediatype += mediatype
+        allmediafocus += mediafocus
+        alllanguage += language
+        allnotes += notes
     
     # clean newline characters
-    region = [r.replace('\n','') for r in region]
-    name = [n.replace('\n','') for n in name]
-    notes = [n.replace('\n','') for n in notes]
+    allregion = [r.replace('\n','') for r in allregion]
+    allname = [n.replace('\n','') for n in allname]
+    allnotes = [n.replace('\n','') for n in allnotes]
     
     # put everything into dataframe
-    alldatadict = {'link': pd.Series(link, index = name),
-                   'media_type': pd.Series(mediatype, index = name),
-                   'media_focus': pd.Series(mediafocus, index = name),
-                   'language': pd.Series(language, index = name),
-                   'notes': pd.Series(notes, index = name),
-                   'region': pd.Series(region, index = name)}
+    alldatadict = {'link': pd.Series(alllink, index = allname),
+                   'media_type': pd.Series(allmediatype, index = allname),
+                   'media_focus': pd.Series(allmediafocus, index = allname),
+                   'language': pd.Series(alllanguage, index = allname),
+                   'notes': pd.Series(allnotes, index = allname),
+                   'region': pd.Series(allregion, index = allname)}
                    
     alldata = pd.DataFrame(alldatadict)
     alldata.index.name = 'name'
@@ -200,7 +222,7 @@ def mediasources(country, url, subcountry=None):
     print 'DONE'
     return alldata
 
-if __name__ == "__main__":
+if __name__ == "__main__" and RUN == True:
     countrydict = getcountries() 
     
     allframes = []

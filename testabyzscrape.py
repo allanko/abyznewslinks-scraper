@@ -153,6 +153,53 @@ class test_abyzscrape(unittest.TestCase):
         self.assertEqual(data['language'][media], 'ENG')
         self.assertEqual(data['notes'][media], '')
     
+    def testFlorida(self):
+        data = mediasources('United States', 'http://www.abyznewslinks.com/unitefl.htm', subcountry = 'Florida')
+        # has a missing <br> character somewhere in the "media type" column
+        # checking alignment near bottom
+        media = 'Sandspur'
+        self.assertEqual(data['link'][media], 'http://www.thesandspur.org/')
+        self.assertEqual(data['region'][media], 'Winter Park')
+        self.assertEqual(data['country'][media], 'United States')
+        self.assertEqual(data['subcountry'][media], 'Florida')
+        self.assertEqual(data['media_type'][media], 'NP')
+        self.assertEqual(data['media_focus'][media], 'CO')
+        self.assertEqual(data['language'][media], 'ENG')
+        self.assertEqual(data['notes'][media], 'Rollins')
+        
+        # checking alignment in middle
+        media = 'Tampa Bay Metro Magazine'
+        self.assertEqual(data['link'][media], 'http://www.tampabaymetro.com/')
+        self.assertEqual(data['region'][media], 'Tampa')
+        self.assertEqual(data['country'][media], 'United States')
+        self.assertEqual(data['subcountry'][media], 'Florida')
+        self.assertEqual(data['media_type'][media], 'MG')
+        self.assertEqual(data['media_focus'][media], 'GI')
+        self.assertEqual(data['language'][media], 'ENG')
+        self.assertEqual(data['notes'][media], '')
+        
+        # checking alignment in middle
+        media = "Water's Edge"
+        self.assertEqual(data['link'][media], 'http://www.waters-edge.com/')
+        self.assertEqual(data['region'][media], 'Jacksonville')
+        self.assertEqual(data['country'][media], 'United States')
+        self.assertEqual(data['subcountry'][media], 'Florida')
+        self.assertEqual(data['media_type'][media], 'MG')
+        self.assertEqual(data['media_focus'][media], 'GI')
+        self.assertEqual(data['language'][media], 'ENG')
+        self.assertEqual(data['notes'][media], '')
+        
+        # checking alignment near top
+        media = "Boca Raton News"
+        self.assertEqual(data['link'][media], 'http://bocanews.com/')
+        self.assertEqual(data['region'][media], 'Boca Raton')
+        self.assertEqual(data['country'][media], 'United States')
+        self.assertEqual(data['subcountry'][media], 'Florida')
+        self.assertEqual(data['media_type'][media], 'IN')
+        self.assertEqual(data['media_focus'][media], 'GI')
+        self.assertEqual(data['language'][media], 'ENG')
+        self.assertEqual(data['notes'][media], '')
+    
     def testMinnesota(self):
         data = mediasources('United States', 'http://www.abyznewslinks.com/unitemn.htm', subcountry = 'Minnesota')
         # has an extra newline character somewhere in the "media focus" column
