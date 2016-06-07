@@ -139,9 +139,12 @@ def mediasources(country, url, subcountry=None):
         else:
             notes = []
         
+        # SPECIAL EXCEPTIONS
         if subcountry == 'Maine' and mediatype[0] == 'NP': # Maine has a typo in the language and notes column of the second table - missing row
             language.insert(75, 'ENG')
             notes.insert(75, '')
+        if country == 'United Nations': # United Nations page is empty
+            continue
         
         # make column lengths equal by adding empty strings
         # consider Yahoo, in Canada/National
@@ -238,3 +241,5 @@ if __name__ == "__main__" and RUN == True:
                 allframes += [mediasources(country, ROOTURL + url[0], subcountry=region)]
     
     allmedia = pd.concat(allframes)
+    allmedia.to_csv('mediasources.csv', encoding = 'utf-8')
+    
