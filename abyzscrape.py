@@ -296,4 +296,4 @@ if __name__ == "__main__" and RUN == True:
     allmedia['media_focus'] = [mediafocuslegend[i] for i in allmedia['media_focus']]
     
     allmedia.to_csv('mediasources.csv', encoding = 'utf-8')
-    allmedia.to_json('mediasources.json', force_ascii = False, orient = 'records')
+    allmedia.reset_index().to_json('mediasources.json', force_ascii = False, orient = 'records')
