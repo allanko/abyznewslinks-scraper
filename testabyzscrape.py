@@ -153,6 +153,40 @@ class test_abyzscrape(unittest.TestCase):
         self.assertEqual(data['language'][media], 'ENG')
         self.assertEqual(data['notes'][media], '')
     
+    def testMaine(self):
+        data = mediasources('United States', 'http://www.abyznewslinks.com/uniteme.htm', subcountry = 'Maine')
+        # maine has a typo in the last two columns - we have a missing entry for South Portland Cape Elizabeth Sentry
+        
+        media = 'South Portland Cape Elizabeth Sentry'
+        self.assertEqual(data['link'][media], 'http://sentry.mainelymediallc.com/')
+        self.assertEqual(data['region'][media], 'South Portland')
+        self.assertEqual(data['country'][media], 'United States')
+        self.assertEqual(data['subcountry'][media], 'Maine')
+        self.assertEqual(data['media_type'][media], 'NP')
+        self.assertEqual(data['media_focus'][media], 'GI')
+        self.assertEqual(data['language'][media], 'ENG')
+        self.assertEqual(data['notes'][media], '')
+        
+        media = 'Compass Classifieds'
+        self.assertEqual(data['link'][media], 'http://penobscotbaypress.com/classifieds/')
+        self.assertEqual(data['region'][media], 'Stonington')
+        self.assertEqual(data['country'][media], 'United States')
+        self.assertEqual(data['subcountry'][media], 'Maine')
+        self.assertEqual(data['media_type'][media], 'NP')
+        self.assertEqual(data['media_focus'][media], 'SH')
+        self.assertEqual(data['language'][media], 'ENG')
+        self.assertEqual(data['notes'][media], '')
+        
+        media = 'Colby Echo'
+        self.assertEqual(data['link'][media], 'http://www.thecolbyecho.com/')
+        self.assertEqual(data['region'][media], 'Waterville')
+        self.assertEqual(data['country'][media], 'United States')
+        self.assertEqual(data['subcountry'][media], 'Maine')
+        self.assertEqual(data['media_type'][media], 'NP')
+        self.assertEqual(data['media_focus'][media], 'CO')
+        self.assertEqual(data['language'][media], 'ENG')
+        self.assertEqual(data['notes'][media], 'Colby')
+    
     def testFlorida(self):
         data = mediasources('United States', 'http://www.abyznewslinks.com/unitefl.htm', subcountry = 'Florida')
         # has a missing <br> character somewhere in the "media type" column

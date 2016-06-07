@@ -10,7 +10,7 @@ import cache
 sys.setrecursionlimit(2500) # so many <br> tags. oceans of <br>. html.parser hates <br>. worst cases: california, argentina
 BS_PARSER = "html.parser" 
 ROOTURL = u'http://www.abyznewslinks.com/'
-RUN = False # switch this to true to run script
+RUN = True # switch this to true to run script
 
 def fetch_webpage_text(url, use_cache=True):
     if use_cache and cache.contains(url):
@@ -138,7 +138,11 @@ def mediasources(country, url, subcountry=None):
             # we'll fix this in the "normalize column lengths" block below
         else:
             notes = []
-            
+        
+        if subcountry == 'Maine' and mediatype[0] == 'NP': # Maine has a typo in the language and notes column of the second table - missing row
+            language.insert(75, 'ENG')
+            notes.insert(75, '')
+        
         # make column lengths equal by adding empty strings
         # consider Yahoo, in Canada/National
         # or Clara Mente, in Argentina/Buenos Aires
