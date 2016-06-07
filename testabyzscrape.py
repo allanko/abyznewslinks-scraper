@@ -36,7 +36,7 @@ class test_abyzscrape(unittest.TestCase):
         # region name has a newline character in the middle
         media = 'El Bruguers'
         self.assertEqual(data['link'][media], 'http://www.elbruguers.cat/')
-        self.assertEqual(data['region'][media], 'Gav\xc3\xa1 -Gav\xc3\xa0')
+        self.assertEqual(data['region'][media], u'Gav\xe1 -Gav\xe0')
         self.assertEqual(data['country'][media], 'Spain')
         self.assertEqual(data['subcountry'][media], None)
         self.assertEqual(data['media_type'][media], 'NP')

@@ -58,7 +58,7 @@ def mediasources(country, url, subcountry=None):
     
     print country, subcountry
 
-    sand = BeautifulSoup(fetch_webpage_text(url), BS_PARSER)
+    sand = BeautifulSoup(fetch_webpage_text(url), BS_PARSER, from_encoding="UTF-8")
     tables = sand.find_all('table')
     
     datatables = []
@@ -83,7 +83,7 @@ def mediasources(country, url, subcountry=None):
         # so we split by <br> tag
         # get mediatype, mediafocus, language, region columns
         # but also sometimes <br> is just missing - if so, attempt to split by \n as well (see Florida table, in "media type" column)
-        typestring = str(cells[2])
+        typestring = unicode(cells[2])
         if typestring.find('<br>') == -1:
             mediatype = [cells[2].get_text().strip()] # only one entry
         else:
@@ -92,7 +92,7 @@ def mediasources(country, url, subcountry=None):
             mediatype = [t.split('\n') if len(t) > 2 else [t] for t in mediatype] # attempt to split by '\n'
             mediatype = [t for cell in mediatype for t in cell] # collapse to one-layer list
         
-        focusstring = str(cells[3])
+        focusstring = unicode(cells[3])
         if focusstring.find('<br>') == -1:
             mediafocus = [cells[3].get_text().strip()] # only one entry
         else:
@@ -101,7 +101,7 @@ def mediasources(country, url, subcountry=None):
             mediafocus = [t.split('\n') if len(t) > 2 else [t] for t in mediafocus] # attempt to split by '\n'
             mediafocus = [t for cell in mediafocus for t in cell] # collapse to one-layer list
                 
-        languagestring = str(cells[4])
+        languagestring = unicode(cells[4])
         if languagestring.find('<br>') == -1:
             language = [cells[4].get_text().strip()] # only one entry
         else:
@@ -110,14 +110,14 @@ def mediasources(country, url, subcountry=None):
             language = [t.split('\n') if len(t) > 3 else [t] for t in language] # attempt to split by '\n'
             language = [t for cell in language for t in cell] # collapse to one-layer list
         
-        regionstring = str(cells[0])
+        regionstring = unicode(cells[0])
         if regionstring.find('<br>') == -1:
             region = [cells[0].get_text().strip()] # only one entry
         else:
             region = [r.strip() for r in regionstring[regionstring[:regionstring.find('<br>')].rfind('>') + 1:regionstring.find('</br>')].split('<br>')]    
         
         # get all the site names and links, row by row, inserting empty strings if there is no <a> tag in that row
-        newentries = str(cells[1]).split('br>') # sometimes there's a typo where </br> is used instead of <br> - looking at you, El Zonda in Argentina
+        newentries = unicode(cells[1]).split('br>') # sometimes there's a typo where </br> is used instead of <br> - looking at you, El Zonda in Argentina
         if '</' in newentries:
             newentries = newentries[:newentries.index('</')] # exclude all the closing tags at the end
         elif '</font>\n</td>' in newentries:
@@ -129,7 +129,7 @@ def mediasources(country, url, subcountry=None):
         # need to check if notes column is empty
         # if empty, will be fixed in the "normalize column lengths" block below
         if len(cells[5].get_text().strip()) != 0: 
-            notestring = str(cells[5]).replace('\n','')
+            notestring = unicode(cells[5]).replace('\n','')
             notestring = notestring[notestring.find('"2">')+4:] # remove prefix tags
             notestring = notestring[:notestring.find('</')] # remove trailing tags
             notes = [r for r in notestring.split('<br>')] # split by <br> tags
@@ -252,7 +252,7 @@ if __name__ == "__main__" and RUN == True:
                        'PA': 'press agency', 
                        'PR': None, # error in http://www.abyznewslinks.com/colom.htm - Diario del Norte (maybe PA?)
                        'RT': None, # error in http://www.abyznewslinks.com/argen.htm - Radio Nacional Catamarca (no idea what this should be - radio = BC?)
-                       '\xc3\x8fN': 'internet' # typo of IN in http://www.abyznewslinks.com/argen.htm - Info Las Heras
+                       u'\xcfN': 'internet' # typo of IN in http://www.abyznewslinks.com/argen.htm - Info Las Heras
                            }
                            
     mediafocuslegend = {'AG': 'agriculture',
