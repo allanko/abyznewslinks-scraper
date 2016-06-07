@@ -102,6 +102,30 @@ class test_abyzscrape(unittest.TestCase):
         self.assertEqual(data['media_focus'][media], 'GI')
         self.assertEqual(data['language'][media], 'ENG')
         self.assertEqual(data['notes'][media], '')
+    
+    def testCanadaYukon(self):
+        data = mediasources('Canada', 'http://www.abyznewslinks.com/canadyk.htm', subcountry = 'Yukon')
+        
+        # table with exactly two rows
+        media = 'Government of Yukon'
+        self.assertEqual(data['link'][media], 'http://www.gov.yk.ca/news/')
+        self.assertEqual(data['region'][media], 'Territory')
+        self.assertEqual(data['country'][media], 'Canada')
+        self.assertEqual(data['subcountry'][media], 'Yukon')
+        self.assertEqual(data['media_type'][media], 'IN')
+        self.assertEqual(data['media_focus'][media], 'GO')
+        self.assertEqual(data['language'][media], 'ENG')
+        self.assertEqual(data['notes'][media], '')
+        
+        media = 'Yukoner Magazine'
+        self.assertEqual(data['link'][media], 'http://www.yukoner.com/')
+        self.assertEqual(data['region'][media], 'Territory')
+        self.assertEqual(data['country'][media], 'Canada')
+        self.assertEqual(data['subcountry'][media], 'Yukon')
+        self.assertEqual(data['media_type'][media], 'MG')
+        self.assertEqual(data['media_focus'][media], 'GI')
+        self.assertEqual(data['language'][media], 'ENG')
+        self.assertEqual(data['notes'][media], '')
         
     def testSierraLeone(self):
         data = mediasources('Sierra Leone', 'http://www.abyznewslinks.com/sierr.htm')

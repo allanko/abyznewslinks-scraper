@@ -7,7 +7,7 @@ import cache
 
 # may take a while to run the first time
 # caches every country page with a 1-second delay
-sys.setrecursionlimit(1500) # so many <br> tags. oceans of <br>. html.parser hates <br>.
+sys.setrecursionlimit(2000) # so many <br> tags. oceans of <br>. html.parser hates <br>. worst cases: california, argentina
 BS_PARSER = "html.parser" 
 ROOTURL = u'http://www.abyznewslinks.com/'
 
@@ -79,7 +79,7 @@ def mediasources(country, url, subcountry=None):
         cells = d.findChildren('td', attrs = {'nowrap':''})
         
         # can't split reliably by '\n' -- see Gava-Gava in Spain, or the Minnesota table.
-        # see Gava-Gava, in Spain
+        # so we split by <br> tag
         # get mediatype, mediafocus, language, region columns
         typestring = str(cells[2])
         if typestring.find('<br>') == -1:
@@ -126,7 +126,7 @@ def mediasources(country, url, subcountry=None):
             # because the notes column doesn't necessarily have an entry for every row
             # we'll fix this in the "normalize column lengths" block below
         
-        # normalize column lengths
+        # make column lengths equal by adding empty strings
         # consider Yahoo, in Canada/National
         # or Clara Mente, in Argentina/Buenos Aires
         # or Sierra Leone Broadcasting Corporation, in Sierra Leone
@@ -200,15 +200,15 @@ def mediasources(country, url, subcountry=None):
     print 'DONE'
     return alldata
 
-#if __name__ == "__main__":
-#    countrydict = getcountries() 
-#    
-#    allframes = []
-#    for country, sub in countrydict.iteritems():
-#        if len(sub) == 1:
-#            allframes += [mediasources(country, ROOTURL + sub[0])]
-#        else:
-#            for region, url in sub[1].iteritems():
-#                allframes += [mediasources(country, ROOTURL + url[0], subcountry=region)]
-#    
-#    allmedia = pd.concat(allframes)
+if __name__ == "__main__":
+    countrydict = getcountries() 
+    
+    allframes = []
+    for country, sub in countrydict.iteritems():
+        if len(sub) == 1:
+            allframes += [mediasources(country, ROOTURL + sub[0])]
+        else:
+            for region, url in sub[1].iteritems():
+                allframes += [mediasources(country, ROOTURL + url[0], subcountry=region)]
+    
+    allmedia = pd.concat(allframes)
