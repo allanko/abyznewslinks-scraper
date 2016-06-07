@@ -241,5 +241,59 @@ if __name__ == "__main__" and RUN == True:
                 allframes += [mediasources(country, ROOTURL + url[0], subcountry=region)]
     
     allmedia = pd.concat(allframes)
-    allmedia.to_csv('mediasources.csv', encoding = 'utf-8')
     
+    mediatypelegend = {'BC': 'broadcast', 
+                       'BU': None, # error in http://www.abyznewslinks.com/ghana.htm - Business Ghana (maybe BC?)
+                       'GI': None, # error in http://www.abyznewslinks.com/unitefl.htm - Forum
+                       'IG': None, # error in http://www.abyznewslinks.com/brazirj.htm - Le Petit Journal (maybe IN?)
+                       'IN': 'internet', 
+                       'MG': 'magazine', 
+                       'NP': 'newspaper', 
+                       'PA': 'press agency', 
+                       'PR': None, # error in http://www.abyznewslinks.com/colom.htm - Diario del Norte (maybe PA?)
+                       'RT': None, # error in http://www.abyznewslinks.com/argen.htm - Radio Nacional Catamarca (no idea what this should be - radio = BC?)
+                       '\xc3\x8fN': 'internet' # typo of IN in http://www.abyznewslinks.com/argen.htm - Info Las Heras
+                           }
+                           
+    mediafocuslegend = {'AG': 'agriculture',
+                        'AL': 'alternative', 
+                        'AL:': 'alternative', # typo in http://www.abyznewslinks.com/uniteco.htm
+                        'AT': 'auto', 
+                        'BC': None, # error in http://www.abyznewslinks.com/norwa.htm - NRK Ostfold
+                        'BU': 'business', 
+                        'CO': 'college university', 
+                        'CS': 'civil service',
+                        'EM': 'employment', 
+                        'EN': 'entertainment', 
+                        'ET': 'ethnic', 
+                        'GI': 'general interest', 
+                        'GII': 'general interest', # typo in http://www.abyznewslinks.com/namib.htm
+                        'GL': 'gay lesbian', 
+                        'GO': 'government', 
+                        'GOI': 'government', # typo in http://www.abyznewslinks.com/egypt.htm
+                        'Gi': 'general interest', # typo in http://www.abyznewslinks.com/skore.htm
+                        'HL': 'homeless', 
+                        'IG': 'general interest', # ?? typo in http://www.abyznewslinks.com/ecuad.htm
+                        'IN': None, # error in http://www.abyznewslinks.com/spain.htm - Galicia Artabra
+                        'LG': 'legal', 
+                        'ML': 'military', 
+                        'NP': None, # error in http://www.abyznewslinks.com/yugos.htm - Politika
+                        'PT': 'parent', 
+                        'RE': 'real estate', 
+                        'RL': 'religion', 
+                        'RLI': 'religion', # typo in http://www.abyznewslinks.com/srila.htm
+                        'SC': 'security', 
+                        'SH': 'shopper', 
+                        'SN': 'senior', 
+                        'SP': 'sport', 
+                        'SR': 'satire', 
+                        'ST': 'science tech', 
+                        'TN': 'teen', 
+                        'TR': 'tourist', 
+                        'YT': 'youth'
+                            }
+    allmedia['media_type'] = [mediatypelegend[i] for i in allmedia['media_type']]
+    allmedia['media_focus'] = [mediafocuslegend[i] for i in allmedia['media_focus']]
+    
+    allmedia.to_csv('mediasources.csv', encoding = 'utf-8')
+    allmedia.to_json('mediasources.json', force_ascii = False, orient = 'records')
