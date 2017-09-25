@@ -145,7 +145,7 @@ class test_abyzscrape(unittest.TestCase):
         # arbitrary row, just to check that everything's lined up
         media = 'Sierra Leone Times'
         self.assertEqual(data['link'][media], 'http://www.sierraleonetimes.com/')
-        self.assertEqual(data['region'][media], 'Foreign')
+        self.assertEqual(data['region'][media], 'National')
         self.assertEqual(data['country'][media], 'Sierra Leone')
         self.assertEqual(data['subcountry'][media], None)
         self.assertEqual(data['media_type'][media], 'IN')
@@ -258,6 +258,43 @@ class test_abyzscrape(unittest.TestCase):
         self.assertEqual(data['media_focus'][media], 'CO')
         self.assertEqual(data['language'][media], 'ENG')
         self.assertEqual(data['notes'][media], 'Normandale Community')
+
+    def testIndiana(self):
+        data = mediasources('United States', 'http://abyznewslinks.com/unitein.htm', subcountry = 'Indiana')
+        # has an extra row inserted at [-6] in the media_type columnn
+
+        # checking WBAA, where the typo occurs 
+        media = 'WBAA'
+        self.assertEqual(data['link'][media], 'http://www.wbaa.org/')
+        self.assertEqual(data['region'][media], 'West Lafayette')
+        self.assertEqual(data['country'][media], 'United States')
+        self.assertEqual(data['subcountry'][media], 'Indiana')
+        self.assertEqual(data['media_type'][media], 'BC')
+        self.assertEqual(data['media_focus'][media], 'GI')
+        self.assertEqual(data['language'][media], 'ENG')
+        self.assertEqual(data['notes'][media], 'FM 101.3')
+        
+        #checking a row below the typo
+        media = "Winchester News Gazette"
+        self.assertEqual(data['link'][media], 'http://www.winchesternewsgazette.com/')
+        self.assertEqual(data['region'][media], 'Winchester')
+        self.assertEqual(data['country'][media], 'United States')
+        self.assertEqual(data['subcountry'][media], 'Indiana')
+        self.assertEqual(data['media_type'][media], 'NP')
+        self.assertEqual(data['media_focus'][media], 'GI')
+        self.assertEqual(data['language'][media], 'ENG')
+        self.assertEqual(data['notes'][media], '')
+
+        #checking a row above the typo
+        media = "Tribune Star"
+        self.assertEqual(data['link'][media], 'http://tribstar.com/')
+        self.assertEqual(data['region'][media], 'Terre Haute')
+        self.assertEqual(data['country'][media], 'United States')
+        self.assertEqual(data['subcountry'][media], 'Indiana')
+        self.assertEqual(data['media_type'][media], 'NP')
+        self.assertEqual(data['media_focus'][media], 'GI')
+        self.assertEqual(data['language'][media], 'ENG')
+        self.assertEqual(data['notes'][media], '')
         
     def testMassachusetts(self):
         data = mediasources('United States', 'http://www.abyznewslinks.com/unitema.htm', subcountry = 'Massachusetts')

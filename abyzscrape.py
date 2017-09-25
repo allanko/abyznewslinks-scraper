@@ -139,13 +139,13 @@ def mediasources(country, url, subcountry=None):
         else:
             notes = []
         
-        # SPECIAL EXCEPTIONS
+        # SPECIAL EXCEPTIONS -- this is for catching typos and other quirks that aren't generalizable
         if subcountry == 'Maine' and mediatype[0] == 'NP': # Maine has a typo in the language and notes column of the second table - missing row
             language.insert(75, 'ENG')
             notes.insert(75, '')
-        if country == 'United Nations': # United Nations page is empty
-            continue
-        
+        if subcountry == 'Indiana' and mediatype[0] == 'NP': #Indiana has a typo in the mediatypes column of the second table - there's an extra row inserted at mediatype[-6]
+            del mediatype[-6]
+
         # make column lengths equal by adding empty strings
         # consider Yahoo, in Canada/National
         # or Clara Mente, in Argentina/Buenos Aires
@@ -243,6 +243,7 @@ if __name__ == "__main__" and RUN == True:
     allmedia = pd.concat(allframes)
     
     mediatypelegend = {'BC': 'broadcast', 
+                       'GC' : 'broadcast', # typo of BC in http://abyznewslinks.com/cuba.htm - Radio Habana Cuba
                        'BU': None, # error in http://www.abyznewslinks.com/ghana.htm - Business Ghana (maybe BC?)
                        'GI': None, # error in http://www.abyznewslinks.com/unitefl.htm - Forum
                        'IG': None, # error in http://www.abyznewslinks.com/brazirj.htm - Le Petit Journal (maybe IN?)
@@ -263,6 +264,7 @@ if __name__ == "__main__" and RUN == True:
                         'BU': 'business', 
                         'CO': 'college university', 
                         'CS': 'civil service',
+                        'ED': 'education',
                         'EM': 'employment', 
                         'EN': 'entertainment', 
                         'ET': 'ethnic', 
@@ -292,6 +294,7 @@ if __name__ == "__main__" and RUN == True:
                         'TR': 'tourist', 
                         'YT': 'youth'
                             }
+
     allmedia['media_type'] = [mediatypelegend[i] for i in allmedia['media_type']]
     allmedia['media_focus'] = [mediafocuslegend[i] for i in allmedia['media_focus']]
     
