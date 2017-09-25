@@ -1,256 +1,259 @@
 country,numnationalsources,numsources
 Afghanistan,124,148
-Africa Regional,0,84
+Africa Regional,0,94
 Albania,49,89
 Algeria,52,183
 American Samoa,1,4
-Americas Regional,0,7
+Americas Regional,0,10
 Andorra,5,9
 Angola,23,40
 Anguilla,6,7
 Antarctica,0,7
-Antigua and Barbuda,6,8
-Argentina,106,1728
+Antigua and Barbuda,9,11
+Argentina,102,2059
 Armenia,85,119
-Aruba,15,22
-Asia Regional,0,67
-Australia,56,575
-Austria,25,88
-Azerbaijan,58,108
-Bahamas,11,21
-Bahrain,9,17
-Bangladesh,60,132
-Barbados,7,11
+Aruba,13,20
+Asia Regional,0,66
+Australia,57,578
+Austria,25,87
+Azerbaijan,57,108
+Bahamas,15,24
+Bahrain,10,18
+Bangladesh,248,363
+Barbados,8,11
 Belarus,24,66
-Belgium,45,98
-Belize,6,23
+Belgium,45,99
+Belize,8,17
 Benin,18,34
-Bermuda,6,7
+Bermuda,9,10
 Bhutan,3,9
-Bolivia,17,43
-Bonaire,6,8
-Bosnia and Herzegovina,27,59
-Botswana,3,16
-Brazil,80,1738
-British Virgin Islands,5,8
+Bolivia,19,44
+Bonaire,9,13
+Bosnia and Herzegovina,30,62
+Botswana,4,17
+Brazil,83,1740
+British Virgin Islands,7,9
 Brunei Darussalam,5,10
-Bulgaria,60,125
+Bulgaria,61,128
 Burkina Faso,13,24
 Burundi,17,18
 Cambodia,11,20
 Cameroon,20,33
-Canada,85,1877
+Canada,85,1921
 Cape Verde,9,15
-Caribbean Regional,0,21
-Cayman Islands,9,13
+Caribbean Regional,0,26
+Cayman Islands,10,15
 Central Africa Republic,8,8
 Central America Regional,0,8
 Chad,7,7
 Chile,43,212
-China,57,380
+China,58,377
 Christmas Island,1,2
 Cocos Islands,1,2
-Colombia,25,115
+Colombia,29,133
 Comoros,7,9
 Congo Brazzaville,2,12
-Congo Kinshasa,11,30
+Congo Kinshasa,12,31
 Cook Islands,3,5
-Costa Rica,21,40
+Costa Rica,30,64
 Cote d'Ivoire,22,32
-Croatia,24,59
-Cuba,32,98
-Curacao,12,19
-Cyprus,29,50
-Czech Republic,50,166
-Denmark,27,164
+Croatia,27,62
+Cuba,53,161
+Curacao,8,13
+Cyprus,38,72
+Czech Republic,51,167
+Denmark,26,163
 Djibouti,4,9
-Dominica,8,11
-Dominican Republic,30,60
+Dominica,7,10
+Dominican Republic,40,71
+Dutch Caribbean,0,7
 Ecuador,19,72
-Egypt,22,48
-El Salvador,12,21
+Egypt,25,51
+El Salvador,22,36
 Equatorial Guinea,6,9
 Eritrea,5,20
 Estonia,20,68
-Ethiopia,7,32
+Ethiopia,8,33
 Europe Regional,0,92
 Faeroe Islands,5,10
-Falkland Islands,3,7
+Falkland Islands,3,6
 Fiji,13,18
-Finland,14,212
-France,49,160
-French Guiana,3,6
+Finland,13,211
+France,49,159
+French Guiana,4,7
 French Polynesia,6,9
 French Southern and Antarctic Lands,1,1
 Gabon,9,10
 Gambia,3,13
-Georgia,47,83
+Georgia,52,97
 Germany,62,555
-Ghana,27,52
-Gibraltar,8,12
-Greece,34,107
+Ghana,34,53
+Gibraltar,8,13
+Greece,34,106
 Greenland,4,7
 Grenada,9,14
-Guadeloupe,3,5
+Guadeloupe,7,9
 Guam,6,9
-Guatemala,13,32
+Guatemala,14,34
 Guernsey,4,5
 Guinea,22,27
 Guinea Bissau,3,6
 Guyana,17,24
-Haiti,12,32
-Holy See,43,43
-Honduras,16,28
+Haiti,20,37
+Holy See,70,70
+Honduras,20,31
 Hong Kong,20,40
-Hungary,40,86
+Hungary,41,87
 Iceland,15,41
-India,102,437
-Indonesia,28,101
-International,0,75
-Iran,47,110
+India,105,449
+Indonesia,29,102
+International,0,74
+Iran,56,111
 Iraq,17,54
-Ireland,12,106
+Ireland,12,105
 Isle of Man,8,11
-Israel,50,86
+Israel,51,87
 Italy,35,202
-Jamaica,12,26
-Japan,34,149
+Jamaica,13,28
+Japan,34,148
 Jersey,3,4
 Jordan,16,26
-Kazakhstan,48,94
-Kenya,16,27
+Kazakhstan,55,99
+Kenya,18,29
 Kiribati,1,1
-Kosovo,30,52
+Kosovo,30,55
 Kuwait,14,28
 Kyrgyzstan,16,27
 Laos,8,18
-Latin America,0,22
-Latvia,35,80
-Lebanon,34,59
+Latin America,0,23
+Latvia,36,81
+Lebanon,35,60
 Lesotho,6,10
-Liberia,15,21
+Liberia,15,22
 Libya,15,19
 Liechtenstein,4,6
-Lithuania,22,69
+Lithuania,23,70
 Luxembourg,12,28
 Macau,8,18
-Macedonia,54,68
+Macedonia,55,69
 Madagascar,11,19
 Malawi,20,24
-Malaysia,23,56
+Malaysia,24,57
 Maldives,19,23
 Mali,7,14
 Malta,10,20
 Marshall Islands,1,3
-Martinique,3,7
+Martinique,6,7
 Mauritania,8,13
-Mauritius,7,18
+Mauritius,8,19
 Mayotte,6,8
-Mexico,50,693
+Mexico,51,697
 Micronesia,3,8
 Moldova,35,67
-Monaco,5,11
+Monaco,5,10
 Mongolia,10,14
-Montenegro,13,19
+Montenegro,14,20
 Montserrat,1,2
-Morocco,29,59
+Morocco,32,61
 Mozambique,10,14
-Myanmar,12,40
-Namibia,5,16
-Nauru,1,1
-Near and Middle East Regional,0,61
+Myanmar,12,39
+Namibia,6,17
+Nauru,2,2
+Near and Middle East Regional,0,66
 Nepal,22,53
-Netherlands,52,175
+Netherlands,52,174
 New Caledonia,2,6
-New Zealand,31,102
-Nicaragua,12,20
+New Zealand,31,101
+Nicaragua,16,26
 Niger,5,6
-Nigeria,134,228
+Nigeria,136,231
 Niue,1,1
 Norfolk Island,1,2
 North Korea,11,17
 Northern Mariana Islands,1,3
 Norway,26,302
-Oman,16,27
+Oman,16,26
 Pacific Regional,0,14
-Pakistan,47,133
+Pakistan,49,134
 Palau,1,2
 Palestine,20,31
-Panama,25,38
-Papua New Guinea,4,6
+Panama,30,50
+Papua New Guinea,5,7
 Paraguay,16,33
 Peru,31,138
-Philippines,23,124
+Philippines,24,125
 Pitcairn,2,5
-Poland,28,116
+Poland,30,118
 Portugal,27,120
-Puerto Rico,11,44
-Qatar,17,25
+Puerto Rico,12,49
+Qatar,15,23
 Reunion,5,8
-Romania,53,203
-Russia,89,466
+Romania,54,204
+Russia,89,462
 Rwanda,5,9
-Saint Barthelemy,3,9
-Saint Helena,0,12
+Saba,1,1
+Saint Barthelemy,2,7
+Saint Helena,0,10
 Saint Kitts and Nevis,9,17
-Saint Lucia,9,12
-Saint Martin,2,6
+Saint Lucia,10,14
+Saint Martin,4,7
 Saint Pierre and Miquelon,5,6
-Saint Vincent and  Grenadines,7,9
-Samoa,3,6
+Saint Vincent and  Grenadines,7,10
+Samoa,4,7
 San Marino,7,10
 Sao Tome and Principe,4,5
-Saudi Arabia,12,25
-Senegal,26,32
-Serbia,77,159
+Saudi Arabia,13,26
+Senegal,28,34
+Serbia,56,146
 Seychelles,4,7
-Sierra Leone,15,44
+Sierra Leone,28,43
 Singapore,6,18
-Sint Maarten,2,8
-Slovakia,30,79
-Slovenia,14,32
+Sint Maarten,8,12
+Slovakia,32,81
+Slovenia,15,33
 Solomon Islands,3,5
 Somalia,6,30
-South Africa,32,173
+South Africa,34,174
 South America Regional,0,1
-South Georgia and South Sandwich Islands,1,2
+South Georgia and South Sandwich Islands,1,1
 South Korea,33,121
-South Sudan,5,19
-Spain,50,525
+South Sudan,5,20
+Spain,50,526
 Sri Lanka,33,65
 Sudan,11,23
-Suriname,7,13
+Suriname,8,14
 Svalbard and Jan Mayen Islands,1,2
 Swaziland,3,5
-Sweden,41,259
+Sweden,44,421
 Switzerland,29,164
 Syria,13,25
 Taiwan,27,48
 Tajikistan,18,28
-Tanzania,11,32
-Thailand,23,67
+Tanzania,12,33
+Thailand,25,67
 Timor Leste,6,13
 Togo,6,17
-Tonga,3,5
-Trinidad and Tobago,11,19
+Tonga,4,6
+Trinidad and Tobago,11,18
 Tunisia,23,32
-Turkey,41,146
-Turkmenistan,31,31
-Turks and Caicos Islands,5,8
+Turkey,42,147
+Turkmenistan,32,32
+Turks and Caicos Islands,7,10
 Tuvalu,1,2
-Uganda,12,24
-Ukraine,142,328
-United Arab Emirates,14,39
-United Kingdom,98,810
-United States,262,12764
-United States Virgin Islands,1,11
-Uruguay,21,82
-Uzbekistan,30,54
-Vanuatu,5,8
-Venezuela,31,154
-Vietnam,36,69
-Wallis and Futuna Islands,3,3
-Western Sahara,0,11
-Yemen,25,54
-Zambia,21,37
-Zimbabwe,27,91
+Uganda,20,37
+Ukraine,144,330
+United Arab Emirates,15,38
+United Kingdom,99,808
+United Nations,0,19
+United States,273,12887
+United States Virgin Islands,4,11
+Uruguay,20,101
+Uzbekistan,62,78
+Vanuatu,6,9
+Venezuela,41,183
+Vietnam,52,233
+Wallis and Futuna Islands,1,1
+Western Sahara,32,32
+Yemen,36,62
+Zambia,35,46
+Zimbabwe,61,92
